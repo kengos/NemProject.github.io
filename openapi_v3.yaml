@@ -1038,7 +1038,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NemAnnounceResult"
-
+  ### 7.9.2
+  /transaction/announce:
+    post:
+      summary: Sending the data to NIS
+      tags:
+        - Transaction
+      externalDocs:
+        url: https://nemproject.github.io/#sending-the-data-to-NIS
+      description: |
+        Creates and broadcasts a transaction.
+        **The private key is not involved.**
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestAnnounce"
+      responses:
+        200:
+          description: NemAnnounceResult object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NemAnnounceResult"
 components:
   schemas:
     AccountHistoricalDataViewModel:
