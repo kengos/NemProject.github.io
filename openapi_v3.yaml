@@ -480,6 +480,82 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/MosaicDefinition"
+  /account/mosaic/owned:
+    get:
+      summary: Retrieving mosaics that an account owns
+      description: Gets an array of mosaic objects for a given account address.
+      parameters:
+        - name: address
+          in: query
+          required: true
+          description: The address of the account.
+          example: TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH
+      responses:
+        200:
+          description: an array of mosaic objects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Mosaic"
+  # FIXME
+  /account/unlock:
+    post:
+      summary: Unlocking the account (enables harvesting) **Request cannot be performed in a browser.**
+      description: Unlocks an account (starts harvesting).
+      parameters:
+        - name: privateKey
+          in: query
+          required: true
+          description: >
+            A PrivateKey JSON object as described in Appendix A: PrivateKey
+          schema:
+            $ref: "#/components/schemas/PrivateKey"
+      responses:
+        200:
+          description: FIXME
+  # FIXME
+  /account/lock:
+    post:
+      summary: Locking the account (stops harvesting) **Request cannot be performed in a browser.**
+      description: Locks an account (stops harvesting).
+      parameters:
+        - name: privateKey
+          in: query
+          required: true
+          description: >
+            A PrivateKey JSON object as described in Appendix A: PrivateKey
+          schema:
+            $ref: "#/components/schemas/PrivateKey"
+  # FIXME
+  /account/unlocked/info:
+    post:
+      summary: Retrieving the unlock info **Request cannot be performed in a browser.**
+      description: >
+        Each node can allow users to harvest with their delegated key on that node.
+
+        The NIS configuration has entries for configuring the maximum number of allowed harvesters and optionally allow harvesting only for certain account addresses.
+
+        The unlock info gives information about the maximum number of allowed harvesters and how many harvesters are already using the node.
+      responses:
+        200:
+          description: FIXME
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  num-unlocked:
+                    type: integer
+                    example: 2
+                  max-unlocked:
+                    type: integer
+                    example: 3
+
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -994,6 +1070,23 @@ components:
     Transaction:
       type: object
       description: TODO
+    # 9.20
+    Mosaic:
+      type: object
+      description: >
+        A mosaic describes an instance of a mosaic definition. Mosaics can be transferred by means of a transfer transaction.
+      properties:
+        mosaicId:
+          $ref: "#/components/schemas/MosaicId"
+        quantity:
+          type: integer
+          description: >
+            The mosaic quantity.
+
+            The quantity is always given in smallest units for the mosaic,
+
+            i.e. if it has a divisibility of 3 the quantity is given in millis.
+          example: 123000
     # 9.21
     MosaicDefinition:
       type: object
@@ -1009,7 +1102,7 @@ components:
           description: The public key of the mosaic definition creator.
           example: 10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100
         id:
-          $ref: "#/components/schemas/MosicId"
+          $ref: "#/components/schemas/MosaicId"
         description:
           type: string
           description: The mosaic description. The description may have a length of up to 512 characters and cannot be empty.
@@ -1105,13 +1198,13 @@ components:
           description: The recipient of the levy.
           example: TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH
         mosaicId:
-          $ref: "#/components/schemas/MosicId"
+          $ref: "#/components/schemas/MosaicId"
         fee:
           type: integer
           description: The mosaic in which the levy is paid.
           example: 1000
     # 9.25
-    MosicId:
+    MosaicId:
       type: object
       description: >
         A mosaic id uniquely identifies an underlying mosaic definition.
@@ -1146,3 +1239,17 @@ components:
           type: integer
           description: The height at which the ownership begins.
           example: 13465
+    # 9.34
+    PrivateKey:
+      type: object
+      description: >
+        A private key is a key to an account.
+
+        Anyone having the private key to an account can initiate any account related action.
+
+        **Therefore a private key must be kept secret at all costs.**
+      properties:
+        value:
+          type: string
+          description: The 256 bit value of the private key as hexadecimal string.
+          example: 68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0
