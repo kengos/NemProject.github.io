@@ -13,38 +13,21 @@ servers:
 paths:
   /heartbeat:
     get:
+      summary: Determines if NIS is up and responsive.
       tags:
         - NIS status
-      summary: Determines if NIS is up and responsive.
       externalDocs:
         url: 'https://nemproject.github.io/#heart-beat-request'
       parameters: []
       responses:
         '200':
-          description: NIS is up
-          headers: null
+          description: NemRequestHeartbeatResult object
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - code
-                  - type
-                  - message
-                properties:
-                  code:
-                    type: integer
-                    format: int32
-                    example: 1
-                  type:
-                    type: integer
-                    format: int32
-                    example: 2
-                  message:
-                    type: string
-                    example: ok
+                $ref: "#/components/schemas/NemRequestHeartbeatResult"
         default:
-          description: >-
+          description: |
             If there is no response to this request, NIS is either not running
             or is in a state where it can't serve requests.
   /status:
@@ -56,50 +39,11 @@ paths:
       parameters: []
       responses:
         '200':
-          description: NIS is up
+          description: NemRequestStatusResult object
           content:
             application/json:
               schema:
-                required:
-                  - code
-                  - type
-                  - message
-                properties:
-                  code:
-                    type: interger
-                    format: int32
-                    enum:
-                      - 0
-                      - 1
-                      - 2
-                      - 3
-                      - 4
-                      - 5
-                      - 6
-                      - 7
-                      - 8
-                    example: 6
-                    description: >
-                      * `0` - Unknown status.
-                      * `1` - NIS is stopped.
-                      * `2` - NIS is starting.
-                      * `3` - NIS is running.
-                      * `4` - NIS is booting the local node (implies NIS is
-                      running).
-                      * `5` - The local node is booted (implies NIS is running).
-                      * `6` - The local node is synchronized (implies NIS is
-                      running and the local node is booted).
-                      * `7` - NIS local node does not see any remote NIS node
-                      (implies running and booted).
-                      * `8` - NIS is currently loading the block chain from the
-                      database. In this state NIS cannot serve any requests.
-                  type:
-                    type: integer
-                    format: int32
-                    example: 4
-                  message:
-                    type: string
-                    example: status
+                $ref: "#/components/schemas/NemRequestStatusResult"
   /account/generate:
     get:
       tags:
@@ -114,28 +58,7 @@ paths:
           content:
             application/json:
               schema:
-                required:
-                  - privateKey
-                  - publicKey
-                  - address
-                properties:
-                  privateKey:
-                    type: string
-                    description: >-
-                      The private key of the account as hexadeciaml string.
-                    example: >-
-                      0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f
-                  publicKey:
-                    type: string
-                    description: The public key of the account as hexadeciaml string.
-                    example: >-
-                      c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3
-                  address:
-                    type: string
-                    description: |
-                      The address of the account.
-                    example: >-
-                      c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3
+                $ref: "#/components/schemas/KeyPairViewModel"
   /account/get:
     get:
       tags:
@@ -155,7 +78,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/AccountMetaDataPair"
+                $ref: "#/components/schemas/AccountMetaDataPair"
   /account/get/from-public-key:
     get:
       tags:
@@ -221,7 +144,7 @@ paths:
       summary: Incoming transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
-      description: >
+      description: |
         A transaction is said to be incoming with respect to an account
         if the account is the recipient of the transaction.
 
@@ -303,7 +226,7 @@ paths:
       summary: Get all transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
-      description: >
+      description: |
         Gets an array of transaction meta data pairs for which an account is the sender or receiver.
 
         A maximum of 25 transaction meta data pairs is returned.
@@ -371,7 +294,7 @@ paths:
                 type: array
                 maxItems: 25
                 items:
-                  $ref: "#/components/schemas/TransactionMetaDataPair"
+                  $ref: "#/components/schemas/UnconfirmedTransactionMetaDataPair"
   # TODO: 3.1.6 Transaction data with decoded messages
   /account/harvests:
     get:
@@ -914,13 +837,16 @@ paths:
         url: https://nemproject.github.io/#retrieving-root-namespaces
       description: |
         Gets the root namespaces.
+
         The requests supports paging, i.e. retrieving the root namespaces in batches of a specified size.
+
         The request returns an array of NamespaceMetaDataPair objects.
       parameters:
         - name: id
           in: query
           description: |
             The topmost namespace database id up to which root namespaces are returned.
+
             The parameter is optional. If not supplied the most recent rented root namespaces are returned.
           example: 26754
         - name: pageSize
@@ -1445,6 +1371,7 @@ components:
                 type: integer
                 description: The unique id of the request.
                 example: 797750
+    # 9.9
     Block:
       type: object
       description: |
@@ -1501,6 +1428,7 @@ components:
           type: integer
           description: The height of the block. Each block has a unique height. Subsequent blocks differ in height by 1.
           example: 39324
+    # 9.10
     BlockChainScore:
       type: object
       description: The block chain score is a measure how good the block chain is. The higher the score, the better the block chain is.
@@ -1574,6 +1502,7 @@ components:
               type: string
               description: The name of the node (can be anything).
               example: Alice
+    # 9.13
     CommunicationTimeStamps:
       type: object
       description: >
@@ -1649,6 +1578,7 @@ components:
           type: string
           description: The hash of the inner transaction. This entry is only available for multisig transactions
           example: ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57
+    # 9.16
     ExtendedNodeExperiencePair:
       type: object
       description: >-
@@ -1682,6 +1612,7 @@ components:
               type: integer
               description: The number of failed communications with the remote node.
               example: 0
+    # 9.17
     HarvestInfo:
       type: object
       description: >
@@ -1710,36 +1641,30 @@ components:
           type: integer
           description: The height of the harvested block.
           example: 38453
-    TransactionMetaDataPair:
+    # 9.18
+    KeyPairViewModel:
       type: object
+      description: |
+        A KeyPairViewModel object contains information about a new account.
+        Information includes the private key, the public key and the address
       required:
-        - meta
-        - transaction
+        - privateKey
+        - publicKey
+        - address
       properties:
-        meta:
-          $ref: "#/components/schemas/TransactionMetaData"
-        transaction:
-          $ref: "#/components/schemas/Transaction"
-    TransactionMetaData:
-      type: object
-      required:
-        - height
-        - id
-        - hash
-      properties:
-        height:
-          type: integer
-          description: The height of the block in which the transaction was included.
-          example: 40706
-        id:
-          type: integer
-          description: The id of the transaction.
-        hash:
-          type: object
-          properties:
-            data:
-              type: string
-              description: The transaction hash.
+        privateKey:
+          type: string
+          description: The private key of the account as hexadeciaml string.
+          example: 0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f
+        publicKey:
+          type: string
+          description: The public key of the account as hexadeciaml string.
+          example: c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3
+        address:
+          type: string
+          description: The address of the account.
+          example: c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3
+    # 9.19
     Transaction:
       anyOf:
         - $ref: '#/components/schemas/ImportanceTransferTransaction'
@@ -1750,6 +1675,7 @@ components:
         - $ref: '#/components/schemas/MultisigTransaction'
         - $ref: '#/components/schemas/ProvisionNamespaceTransaction'
         - $ref: '#/components/schemas/TransferTransaction'
+    # 9.19 -1
     TransactionBase:
       type: object
       properties:
@@ -1789,6 +1715,7 @@ components:
           type: string
           description: The public key of the account that created the transaction.
           example: a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a
+    # 9.19.1
     ImportanceTransferTransaction:
       description: |
         NIS has the ability to transfer the importance of one account to another account for harvesting.
@@ -2398,6 +2325,73 @@ components:
             * `6` - The local node is synchronized (implies NIS is running and the local node is booted).
             * `7` - There is no remote node available (implies NIS is running and the local node is booted).
             * `8` - NIS is currently loading the block chain.
+        message:
+          type: string
+          example: ok
+    # 9.30 - 1
+    NemRequestHeartbeatResult:
+      type: object
+      description: |
+        The NemAnnounceResult extends the NemRequestResult by supplying the additional fields 'transactionHash'
+        and in case of a multisig transaction 'innerTransactionHash'.
+      allOf:
+        - $ref: '#/components/schemas/NemRequestResult'
+        - properties:
+            type:
+              type: integer
+              enum:
+                - 2
+              example: 2
+              description: |
+                `2` - The result is a heart beat result.
+            code:
+              type: integer
+              enum:
+                - 1
+              example: 1
+              description: |
+                * `1` - Successful heart beat detected.
+            message:
+              example: ok
+    # 9.30 - 2
+    NemRequestStatusResult:
+      type: object
+      description: |
+        The NemRequestStatusResult extends the NemRequestResult
+      allOf:
+        - $ref: '#/components/schemas/NemRequestResult'
+        - properties:
+            code:
+              type: interger
+              format: int32
+              enum:
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+              example: 6
+              description: |
+                * `0` - Unknown status.
+                * `1` - NIS is stopped.
+                * `2` - NIS is starting.
+                * `3` - NIS is running.
+                * `4` - NIS is booting the local node (implies NIS is running).
+                * `5` - The local node is booted (implies NIS is running).
+                * `6` - The local node is synchronized (implies NIS is running and the local node is booted).
+                * `7` - NIS local node does not see any remote NIS node (implies running and booted).
+                * `8` - NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests.
+            type:
+              type: integer
+              format: int32
+              example: 4
+            message:
+              type: string
+              example: status
     # 9.31
     NisNodeInfo:
       type: object
@@ -2581,3 +2575,91 @@ components:
           type: integer
           example: 36
           description: The change in milliseconds compared to the last synchronization.
+    # 9.38
+    TransactionMetaData:
+      type: object
+      required:
+        - height
+        - id
+        - hash
+      properties:
+        height:
+          type: integer
+          description: The height of the block in which the transaction was included.
+          example: 40706
+        id:
+          type: integer
+          description: The id of the transaction.
+        hash:
+          type: object
+          properties:
+            data:
+              type: string
+              description: The transaction hash.
+    # 9.39
+    TransactionMetaDataPair:
+      type: object
+      required:
+        - meta
+        - transaction
+      properties:
+        meta:
+          $ref: "#/components/schemas/TransactionMetaData"
+        transaction:
+          $ref: "#/components/schemas/Transaction"
+    # 9.40
+    UnconfirmedTransactionMetaData:
+      type: object
+      description: |
+        The unconfirmed transaction meta data contains the hash of the inner transaction in case the transaction is a multisig transaction.
+        This data is need to initiate a multisig signature transaction.
+      required:
+        - data
+      properties:
+        data:
+          type: string
+          example: d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873
+          description: The hash of the inner transaction or null if the transaction is not a multisig transaction.
+    # 9.41
+    UnconfirmedTransactionMetaDataPair:
+      type: object
+      description: |
+        Transactions meta data object contains additional information about the transaction.
+      required:
+        - meta
+        - transaction
+      properties:
+        meta:
+          $ref: "#/components/schemas/UnconfirmedTransactionMetaData"
+        transaction:
+          $ref: "#/components/schemas/Transaction"
+    # 9.42
+    ErrorObject:
+      type: object
+      description: |
+        If NIS encounters an error due to either invalid requests or internal problems, it returns a JSON error object.
+        The interpretation of the error object is dependant on the context.
+
+        [See Appendix B: NIS Errors](https://nemproject.github.io/#appendix-B:-NIS-errors) for detailed information about possible errors.
+      required:
+        - timeStamp
+        - error
+        - message
+        - status
+      properties:
+        timeStamp:
+          type: integer
+          example: 9108808
+          description: The number of seconds elapsed since the creation of the nemesis block.
+        error:
+          type: string
+          example: Bad Request
+          description: The general description of the error.
+        message:
+          type: string
+          example: The detailed error message.
+          description: address must be valid
+        status:
+          type: integer
+          example: 400
+          description: The HTTP status.
