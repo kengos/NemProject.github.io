@@ -802,6 +802,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NodeCollection"
+  ### 5.2.2
+  /node/peer-list/reachable:
+    get:
+      summary: Get reachable neighborhood
+      tags:
+        - node
+      externalDocs:
+        url: https://nemproject.github.io/#reachable-neighborhood
+      description: Gets an array of all nodes with status 'active' in the neighborhood.
+      parameters: []
+      responses:
+        200:
+          description: an array of Node objects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Node"
 components:
   schemas:
     AccountHistoricalDataViewModel:
