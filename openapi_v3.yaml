@@ -909,7 +909,7 @@ paths:
     get:
       summary: Retrieving root namespaces
       tags:
-        - namespace
+        - Namespace
       externalDocs:
         url: https://nemproject.github.io/#retrieving-root-namespaces
       description: |
@@ -1012,6 +1012,33 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/MosaicDefinitionMetaDataPair"
+  # 7
+  ## 7.1
+  ### 7.1.1
+  /transaction/prepare-announce:
+    post:
+      summary: Initiating a transaction
+      tags:
+        - Transaction
+      externalDocs:
+        url: https://nemproject.github.io/#initiating-a-transaction
+      description: |
+        Creates and broadcasts a transaction.
+        Since this request involves the private key of an account, it should only be sent to a **local** NIS.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPrepareAnnounce"
+      responses:
+        200:
+          description: NemAnnounceResult object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NemAnnounceResult"
+
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -1636,13 +1663,10 @@ components:
           description: The public key of the account that created the transaction.
           example: a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a
     ImportanceTransferTransaction:
-      description: >
+      description: |
         NIS has the ability to transfer the importance of one account to another account for harvesting.
-
         The account receiving the importance is called the remote account.
-
         Importance transfer transactions are part of the secure harvesting feature of NEM.
-
         Once an importance transaction has been included in a block it needs 6 hours to become active.
       allOf:
         - $ref: '#/components/schemas/TransactionBase'
@@ -1666,9 +1690,8 @@ components:
               example: cc6c9485d15b992501e57fe3799487e99de272f79c5442de94eeb998b45e0144
     # 9.19.2
     MosaicDefinitionCreationTransaction:
-      description: >
+      description: |
         Before a mosaic can be created or transferred, a corresponding definition of the mosaic has to be created and published to the network.
-
         This is done via a mosaic definition creation transaction.
       allOf:
         - $ref: '#/components/schemas/TransactionBase'
@@ -2085,6 +2108,116 @@ components:
               example: 26264
         namespace:
           $ref: "#/components/schemas/Namespace"
+    # 9.28
+    NemAnnounceResult:
+      type: object
+      description: |
+        The NemAnnounceResult extends the NemRequestResult by supplying the additional fields 'transactionHash'
+        and in case of a multisig transaction 'innerTransactionHash'.
+      allOf:
+        - $ref: '#/components/schemas/NemRequestResult'
+        - type: object
+          required:
+            - transactionHash
+          properties:
+            transactionHash:
+              type: object
+              description: The JSON hash object of the transaction.
+              required:
+                - data
+              properties:
+                data:
+                  type: string
+                  example: c1786437336da077cd572a27710c40c378610e8d33880bcb7bdb0a42e3d35586
+            innerTransactionHash:
+              type: object
+              description: |
+                The JSON hash object of the inner transaction or null if the transaction is not a multisig transaction.
+              required:
+                - data
+              properties:
+                data:
+                  type: string
+                  example: 44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039
+
+    # 9.30
+    NemRequestResult:
+      type: object
+      description: |
+        Some requests such as announcing a new transaction return detailed information about the outcome of the request.
+
+        In those cases the result of the request is returned in a special JSON object called NemRequestResult.
+
+        The structure is typically used for requests that perform validation or return a status.
+      required:
+        - type
+        - code
+        - message
+      properties:
+        type:
+          type: integer
+          example: 4
+          description: |
+            The type is dependent on the request which was answered.
+
+            The interpretation of the code field depends on the type. Currently the following types are supported:
+
+            * `1` - The result is a validation result.
+            * `2` - The result is a heart beat result.
+            * `4` - The result indicates a status.
+        code:
+          type: integer
+          example: 6
+          description: |
+            The meaning of the code is dependent on the type.
+
+            For type 1 (validation result) only 0 and 1 mean there was no failure.
+
+            For a complete list of validation results see Appendix B: NIS Errors The following codes are the most frequent ones occurring:
+
+            * `0` - Neutral result.
+
+              A typical example would be that a node validates an incoming transaction and realizes that it already knows about the transaction.
+              In this case it is neither a success (meaning the node has a new transaction) nor a failure (because the transaction itself is valid).
+            * `1` - Success result.
+
+              A typical example would be that a node validates a new valid transaction.
+            * `2` - Unknown failure.
+
+              The validation failed for unknown reasons.
+            * `3` - The entity that was validated has already past its deadline.
+            * `4` - The entity used a deadline which lies too far in the future.
+            * `5` - There was an account involved which had an insufficient balance to perform the operation.
+            * `6` - The message supplied with the transaction is too large.
+            * `7` - The hash of the entity which got validated is already in the database.
+            * `8` - The signature of the entity could not be validated.
+            * `9` - The entity used a timestamp that lies too far in the past.
+            * `10` - The entity used a timestamp that lies in the future which is not acceptable.
+            * `11` - The entity is unusable.
+            * `12` - The score of the remote block chain is inferior (although a superior score was promised).
+            * `13` - The remote block chain failed validation.
+            * `14` - There was a conflicting importance transfer detected.
+            * `15` - There were too many transaction in the supplied block.
+            * `16` - The block contains a transaction that was signed by the harvester.
+            * `17` - A previous importance transaction conflicts with a new transaction.
+            * `18` - An importance transfer activation was attempted while previous one is active.
+            * `19` - An importance transfer deactivation was attempted but is not active.
+
+            For type 2 the following codes are supported:
+
+            * `1` - Successful heart beat detected.
+
+            For type 3 the following codes are supported:
+
+            * `0` - Unknown status.
+            * `1` - NIS is stopped.
+            * `2` - NIS is starting.
+            * `3` - NIS is running.
+            * `4` - NIS is booting the local node (implies NIS is running).
+            * `5` - The local node is booted (implies NIS is running).
+            * `6` - The local node is synchronized (implies NIS is running and the local node is booted).
+            * `7` - There is no remote node available (implies NIS is running and the local node is booted).
+            * `8` - NIS is currently loading the block chain.
     # 9.31
     NisNodeInfo:
       type: object
@@ -2213,4 +2346,38 @@ components:
         value:
           type: string
           description: The 256 bit value of the private key as hexadecimal string.
+          example: 68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0
+    # 9.35
+    RequestAnnounce:
+      type: object
+      description: |
+        A RequestAnnounce object is used to transfer the transaction data and the signature to NIS in order to initiate and broadcast a transaction.
+      properties:
+        data:
+          type: string
+          description: |
+            The transaction data as string.
+            The string is created by first creating the corresponding byte array (see chapter 6.7)
+            and then converting the byte array to a hexadecimal string.
+          example: |
+            010100000100000000000000200000002b76078fa709bbe6752222b215abc7ec0152ffe831fb4f9aed3e7749a425900a00093d0000000000000000002800000054444e46555946584f5353334e4e4c4f35465a5348535a49354c33374b4e5149454850554d584c54c0d45407000000000b00000001000000030000000c3215
+        signature:
+          type: string
+          description: The signature for the transaction as hexadecimal string.
+          example: |
+            db2473513c7f0ce9f8de6345f0fbe773dc687eb571123d08eab4d98f96849eaeb63fa8756fb6c59d9b9d0e551537c1cdad4a564747ff9291db4a88b65c97c10d"
+    # 9.36
+    RequestPrepareAnnounce:
+      type: object
+      description: |
+        A RequestPrepareAnnounce object is used to transfer transaction data and a private key to NIS in order to initiate and broadcast a transaction.
+      required:
+        - transaction
+        - privateKey
+      properties:
+        transaction:
+          $ref: "#/components/schemas/Transaction"
+        privateKey:
+          type: string
+          description: The private key which NIS will use to sign the transaction.
           example: 68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0
