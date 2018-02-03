@@ -784,6 +784,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NisNodeInfo"
+  ## 5.2
+  ### 5.2.1
+  /node/peer-list/all:
+    get:
+      summary: Get complete neighborhood
+      tags:
+        - node
+      externalDocs:
+        url: https://nemproject.github.io/#complete-neighborhood
+      description: Gets an array of all known nodes in the neighborhood.
+      parameters: []
+      responses:
+        200:
+          description: NodeCollection object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NodeCollection"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -1912,7 +1930,35 @@ components:
               description: The public key used to identify the node.
               example: 3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350
     # 9.33
-
+    NodeCollection:
+      type: object
+      description: >
+        A NodeCollection object holds arrays of nodes with different statuses. The following statuses are supported:
+      properties:
+        inactive:
+          type: array
+          description: Denotes the beginning of the array of inactive nodes.
+          items:
+            $ref: "#/components/schemas/Node"
+          example: []
+        active:
+          type: array
+          description: Denotes the beginning of the array of active nodes.
+          items:
+            $ref: "#/components/schemas/Node"
+          example: []
+        busy:
+          type: array
+          description: Denotes the beginning of the array of busy nodes.
+          items:
+            $ref: "#/components/schemas/Node"
+          example: []
+        failure:
+          type: array
+          description: Denotes the beginning of the array of failure nodes.
+          items:
+            $ref: "#/components/schemas/Node"
+          example: []
     # 9.34
     PrivateKey:
       type: object
