@@ -555,7 +555,53 @@ paths:
                   max-unlocked:
                     type: integer
                     example: 3
+  # 3.2 Retrieving historical account data
+  /account/historical/get:
+    get:
+      summary: Retrieving historical account data
+      exnternalDocs:
+        url: https://nemproject.github.io/#retrieving-historical-account-data
+      description: >
+        The configuration for NIS offers the possibility for a node to expose additional features that other nodes don't want to offer.
 
+        One of those features is the supply of historical account data like balance and importance information.
+
+        To turn on this feature for your NIS, you need to add HISTORICAL_ACCOUNT_DATA to the list of optional features in the file config.properties.
+      parameters:
+        - name: address
+          in: query
+          description: The address of the account.
+          example: NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ
+        - name: startHeight
+          in: query
+          description: The block height from which on the data should be supplied.
+          example: 17592
+        - name: endHeight
+          in: query
+          description: >
+            The block height up to which the data should be supplied.
+
+            The end height must be greater than or equal to the start height.
+          example: 17592
+        - name: increment
+          in: query
+          description: >
+            The value by which the height is incremented between each data point.
+
+            The value must be greater than 0. NIS can supply up to 1000 data points with one request.
+
+            Requesting more than 1000 data points results in an error.
+          example: 1
+      responses:
+        200:
+          description: an array of AccountHistoricalDataViewModel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/AccountHistoricalDataViewModel"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -571,21 +617,27 @@ components:
         address:
           type: string
           description: The address of the account.
+          example: NALICELGU3IVY4DPJKHYLSSVYFFWYS5QPLYEZDJJ
         balance:
           type: integer
           description: The balance of the account.
+          example: 509676000000
         vestedBalance:
           type: integer
           description: The vested part of the balance.
+          example: 100999147150
         unvestedBalance:
           type: integer
           description: The unvested part of the balance.
+          example: 408676852850
         importance:
           type: number
           description: The importance of the account.
+          example: 0.00008857563463531297
         pageRank:
           type: number
           description: The page rank part of the importance.
+          example: 0.0007605047835049349
     AccountImportanceViewModel:
       type: object
       description: >
