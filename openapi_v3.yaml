@@ -934,6 +934,7 @@ paths:
             The default value is 25, the minimum value is 5 and hte maximum value is 100.
       responses:
         200:
+          description: an array of NamespaceMetaDataPair objects
           content:
             application/json:
               schema:
@@ -943,6 +944,29 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/NamespaceMetaDataPair"
+  # 6.1.2
+  /namespace:
+    get:
+      summary: Retrieving root namespaces
+      tags:
+        - namespace
+      externalDocs:
+        url: https://nemproject.github.io/#retrieving-root-namespaces
+      description: |
+        Gets the namespace with given id.
+      parameters:
+        - name: namespace
+          in: query
+          description: The namespace id.
+          type: string
+          example: makoto.metal.coins
+      responses:
+        200:
+          content:
+            description: Namespace object
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Namespace"
 components:
   schemas:
     AccountHistoricalDataViewModel:
