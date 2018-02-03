@@ -380,6 +380,25 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/HarvestInfo"
+  /account/importances:
+    get:
+      summary: Retrieving account importances for accounts
+      exnternalDocs:
+        url: https://nemproject.github.io/#retrieving-account-importances-for-accounts
+      description: Gets an array of account importance view model objects.
+      parameters: []
+      responses:
+        200:
+          description: AccountImportanceViewModel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AccountImportanceViewModel"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -416,6 +435,8 @@ components:
         Each account is assigned an importance in the NEM network.
         The ability of an account to generate new blocks is proportional to its importance.
         The importance is a number between 0 and 1.
+      required:
+        - address
       properties:
         address:
           type: string
@@ -424,6 +445,8 @@ components:
         importance:
           type: object
           description: Substructure that describes the importance of the account.
+          required:
+            - isSet
           properties:
             isSet:
               type: integer
