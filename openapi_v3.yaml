@@ -354,7 +354,7 @@ paths:
   /account/harvests:
     get:
       summary: Requesting harvest info data for an account
-      exnternalDocs:
+      externalDocs:
         url: https://nemproject.github.io/#requesting-harvest-info-data-for-an-account
       description: Gets an array of harvest info objects for an account.
       parameters:
@@ -383,7 +383,7 @@ paths:
   /account/importances:
     get:
       summary: Retrieving account importances for accounts
-      exnternalDocs:
+      externalDocs:
         url: https://nemproject.github.io/#retrieving-account-importances-for-accounts
       description: Gets an array of account importance view model objects.
       parameters: []
@@ -402,7 +402,7 @@ paths:
   /account/namespace/page:
     get:
       summary: Retrieving namespaces that an account owns
-      exnternalDocs:
+      externalDocs:
         url: https://nemproject.github.io/#retrieving-namespaces-that-an-account-owns
       description: >
         Gets an array of namespace objects for a given account address.
@@ -559,7 +559,7 @@ paths:
   /account/historical/get:
     get:
       summary: Retrieving historical account data
-      exnternalDocs:
+      externalDocs:
         url: https://nemproject.github.io/#retrieving-historical-account-data
       description: >
         The configuration for NIS offers the possibility for a node to expose additional features that other nodes don't want to offer.
@@ -602,6 +602,57 @@ paths:
                 properties:
                   data:
                     $ref: "#/components/schemas/AccountHistoricalDataViewModel"
+  # 4.1.1 Block chain height
+  /chain/height:
+    get:
+      summary: Get block chain height
+      externalDocs:
+        url: https://nemproject.github.io/#block-chain-height
+      description: Gets the current height of the block chain.
+      parameters: []
+      responses:
+        200:
+          description: the current height of the block chain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlockHeight"
+  # 4.1.2 Block chain score
+  /chain/score:
+    get:
+      summary: Get block chain score
+      externalDocs:
+        url: https://nemproject.github.io/#block-chain-score
+      description: >
+        Gets the current score of the block chain.
+
+        The higher the score, the better the chain.
+
+        During synchronization, nodes try to get the best block chain in the network.
+      parameters: []
+      responses:
+        200:
+          description: the current score of the block chain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlockChainScore"
+  # 4.1.3
+  /chain/last-block:
+    get:
+      summary: Get last block of the block chain score
+      externalDocs:
+        url: https://nemproject.github.io/#last-block-of-the-block-chain-score
+      description: Gets the current last block of the chain.
+      parameters: []
+      responses:
+        200:
+          description: the current last Block object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Block"
+
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -926,6 +977,7 @@ components:
             See Appendix A: Transaction for more details about this structure.
           items:
             $ref: '#/components/schemas/Transaction'
+          example: []
         version:
           type: integer
           description: >
