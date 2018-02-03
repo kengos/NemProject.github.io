@@ -652,7 +652,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Block"
-
+  # 4.2
+  ## 4.2.1
+  /block/at/public:
+    post:
+      summary: Getting a block with a given height
+      externalDocs:
+        url: https://nemproject.github.io/#getting-a-block-with-a-given-height
+      description: Gets a block from the chain that has the given height.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlockHeight"
+      responses:
+        200:
+          description: the current last Block object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Block"
 components:
   schemas:
     AccountHistoricalDataViewModel:
