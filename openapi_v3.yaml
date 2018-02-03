@@ -949,7 +949,7 @@ paths:
     get:
       summary: Retrieving root namespaces
       tags:
-        - namespace
+        - Namespace
       externalDocs:
         url: https://nemproject.github.io/#retrieving-root-namespaces
       description: |
@@ -967,6 +967,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Namespace"
+  ### 6.2.1
+  /namespace/mosaic/definition/page:
+    get:
+      summary: Retrieving mosaic definitions
+      tags:
+        - Mosaics
+      externalDocs:
+        url: https://nemproject.github.io/#retrieving-root-namespaces
+      description: |
+        Gets the mosaic definitions for a given namespace.
+        The request supports paging.
+        The request return an array of MosaicDefinitionMetaDataPair objects.
+      parameters:
+        - name: namespace
+          in: query
+          description: The namespace id.
+          type: string
+          example: makoto.metal.coins
+        - name: id
+          in: query
+          description: |
+            The topmost mosaic definition database id up to which root mosaic definitions are returned.
+            The parameter is optional.
+            If not supplied the most recent mosaic definitiona are returned.
+        - name: pageSize
+          in: query
+          type: integer
+          minimum: 5
+          maximum: 100
+          description: |
+            The number of namespace objects to be returned for each request.
+            The parameter is optional.
+            The default value is 25, the minimum value is 5 and hte maximum value is 100.
+      responses:
+        200:
+          description: an array of MosaicDefinitionMetaDataPair objects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MosaicDefinitionMetaDataPair"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -1881,6 +1926,23 @@ components:
           $ref: "#/components/schemas/MosaicProperties"
         levy:
           $ref: "#/components/schemas/MosaicLevy"
+    # 9.22
+    MosaicDefinitionMetaDataPair:
+      type: object
+      description: |
+        A mosaic definition consists of a database id and a mosaic definition object.
+        The id is needed for requests that support paging.
+      properties:
+        meta:
+          type: object
+          description: The label for the meta data object.
+          properties:
+            id:
+              type: integer
+              description: The id for the mosaic definition object.
+              example: 3541
+        mosaic:
+          $ref: "#/components/schemas/Mosaic"
     # 9.23
     MosaicProperties:
       type: object
