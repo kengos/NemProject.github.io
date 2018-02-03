@@ -902,7 +902,47 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/BootNodeRequest"
-
+  # 6
+  ## 6.1
+  ### 6.1.1
+  /namespace/root/page:
+    get:
+      summary: Retrieving root namespaces
+      tags:
+        - namespace
+      externalDocs:
+        url: https://nemproject.github.io/#retrieving-root-namespaces
+      description: |
+        Gets the root namespaces.
+        The requests supports paging, i.e. retrieving the root namespaces in batches of a specified size.
+        The request returns an array of NamespaceMetaDataPair objects.
+      parameters:
+        - name: id
+          in: query
+          description: |
+            The topmost namespace database id up to which root namespaces are returned.
+            The parameter is optional. If not supplied the most recent rented root namespaces are returned.
+          example: 26754
+        - name: pageSize
+          in: query
+          type: integer
+          minimum: 5
+          maximum: 100
+          description: |
+            The number of namespace objects to be returned for each request.
+            The parameter is optional.
+            The default value is 25, the minimum value is 5 and hte maximum value is 100.
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/NamespaceMetaDataPair"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -1575,12 +1615,10 @@ components:
               example: 53e140b5947f104cabc2d6fe8baedbc30ef9a0609c717d9613de593ec2a266d3
             mosaicDefinition:
               $ref: '#/components/schemas/MosaicDefinition'
-
     # 9.19.3
     MosaicSupplyChangeTransaction:
-      description: >
+      description: |
         Before a mosaic can be created or transferred, a corresponding definition of the mosaic has to be created and published to the network.
-
         This is done via a mosaic definition creation transaction.
       allOf:
         - $ref: '#/components/schemas/TransactionBase'
@@ -1600,7 +1638,6 @@ components:
               example: 123
             mosaicId:
               $ref: '#/components/schemas/MosaicId'
-
     # 9.19.4
     MultisigAggregateModificationTransaction:
       description: >
@@ -1635,7 +1672,6 @@ components:
                   type: integer
                   description: Value indicating the relative change of the minimum cosignatories.
                   example: 2
-
     # 9.19.5
     MultisigCosignatoryModification:
       type: object
@@ -1664,11 +1700,9 @@ components:
           example: 213150649f51d6e9113316cbec5bf752ef7968c1e823a28f19821e91daf848be
     # 9.19.6
     MultisigSignatureTransaction:
-      description: >
+      description: |
         Multisig signature transactions are part of the NEM's multisig account system.
-
         Multisig signature transactions are included in the corresponding multisig transaction and
-
         are the way a cosignatory of a multisig account can sign a multisig transaction for that account.
 
       allOf:
@@ -1686,18 +1720,13 @@ components:
               type: string
               description: The address of the corresponding multisig account.
               example: TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA
-
     # 9.19.7
     MultisigTransaction:
-      description: >
+      description: |
         Multisig transaction are the only way to make transaction from a multisig account to another account.
-
         A multisig transaction carries another transaction inside (often referred to as "inner" transaction).
-
         The inner transaction can be a transfer, an importance transfer or an aggregate modification transaction.
-
         A multisig transaction also has multisig signature transactions from the cosignatories of the multisig account inside.
-
       allOf:
         - $ref: '#/components/schemas/TransactionBase'
         - type: object
@@ -1735,17 +1764,13 @@ components:
               type: string
               description: The parent namespace. This can be null if the transaction rents a root namespace.
               example: alice
-    # 1.19.9
+    # 9.19.9
     TransferTransaction:
-      description: >
+      description: |
         Transfer transactions contain data about transfers of XEM or mosaics to another account.
-
         There are two version of transfer transactions, version 1 and version 2.
-
         Version 1 transfer transaction are only capable of transferring XEM and a message
-
         while version 2 transfer transactions additionally can transfer a set of mosaics.
-
       allOf:
         - $ref: '#/components/schemas/TransactionBase'
         - type: object
@@ -1791,8 +1816,7 @@ components:
                 The array of Mosaic objects.
               items:
                 $ref: '#/components/schemas/Mosaic'
-
-
+    # 9.20
     Mosaic:
       type: object
       description: >
@@ -1836,7 +1860,7 @@ components:
     # 9.23
     MosaicProperties:
       type: object
-      description: >
+      description: |-
         Each mosaic definition comes with a set of properties.
 
         Each property has a default value which will be applied in case it was not specified.
@@ -1845,29 +1869,26 @@ components:
 
         The available properties and their default values are:
 
-        * `divisibility` -
+        * `divisibility`
 
           defines the smallest sub-unit that a mosaic can be divided into.
 
           A divisibility of 0 means that only entire units can be transferred while a divisibility of 3 means the mosaic can be transferred in milli-units.
-
-        * `initialSupply` -
+        * `initialSupply`
 
           defines how many units of the mosaic are initially created.
 
           These mosaics are credited to the creator of the mosaic.
 
           The initial supply has an upper limit of 9,000,000,000 units.
-
-        * `supplyMutable` -
+        * `supplyMutable`
 
           determines whether or not the supply can be changed by the creator at a later point using a MosaicSupplyChangeTransaction.
 
           Possible values are "true" and "false",
 
           the former meaning the supply can be changed and the latter that the supply is fixed for all times.
-
-        * `transferable` -
+        * `transferable`
 
           determines whether or not the a mosaic can be transferred to a user other than the creator.
 
@@ -1942,11 +1963,9 @@ components:
     # 9.26
     Namespace:
       type: object
-      description: >
+      description: |
         A namespace is the NEM version of a domain.
-
         You can rent a namespace for the duration of a year by paying a fee.
-
         The naming of the parts of a namespace has certain restrictions, see the corresponding chapter on namespaces.
       properties:
         fqn:
@@ -1961,6 +1980,25 @@ components:
           type: integer
           description: The height at which the ownership begins.
           example: 13465
+    # 9.27
+    NamespaceMetaDataPair:
+      type: object
+      description: |
+        A namespace consists of a namespace object and a database id. the id is needed for requests that support paging.
+      required:
+        - meta
+        - namespace
+      properties:
+        meta:
+          type: object
+          description: The label for the meta data object.
+          properties:
+            id:
+              type: integer
+              description: The database id for the namespace object.
+              example: 26264
+        namespace:
+          $ref: "#/components/schemas/Namespace"
     # 9.31
     NisNodeInfo:
       type: object
