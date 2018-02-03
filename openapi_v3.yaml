@@ -824,6 +824,48 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Node"
+  ### 5.2.3
+  /node/peer-list/active:
+    get:
+      summary: Get active neighborhood
+      tags:
+        - node
+      externalDocs:
+        url: https://nemproject.github.io/#active-neighborhood
+      description: Gets an array of active nodes in the neighborhood that are selected for broadcasts.
+      parameters: []
+      responses:
+        200:
+          description: an array of Node objects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Node"
+  ### 5.2.4
+  /node/peer-list/max-chain-height:
+    get:
+      summary: Get maximum chain height in the active neighborhood
+      tags:
+        - node
+      externalDocs:
+        url: https://nemproject.github.io/#maximum-chain-height-in-the-active-neighborhood
+      description: >-
+        Requests the chain height from every node in the active node list (described in Active neighborhood)
+        and returns the maximum height seen.
+      parameters: []
+      responses:
+        200:
+          description: BlockHeight object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlockHeight"
+
 components:
   schemas:
     AccountHistoricalDataViewModel:
