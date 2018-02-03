@@ -865,7 +865,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BlockHeight"
-
+  ## 5.3
+  /node/experiences:
+    get:
+      summary: Requesting node experiences
+      tags:
+        - node
+      externalDocs:
+        url: https://nemproject.github.io/#requesting-node-experiences
+      description: >-
+        Gets an array of node experiences from another node.
+        Each node saves its experiences with other nodes in an internal map.
+        Sharing experiences helps nodes to select honest nodes for communication.
+      parameters: []
+      responses:
+        200:
+          description: ExtendedNodeExperiencePair object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExtendedNodeExperiencePair"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -1357,15 +1376,39 @@ components:
           type: string
           description: The hash of the inner transaction. This entry is only available for multisig transactions
           example: ae3b107f1216e1ccf12b6f3c3c555bc1d95311747338ce66f539ea2c18c0aa57
-    # TODO: 9.16
     ExtendedNodeExperiencePair:
       type: object
-      description: >
+      description: >-
         When exchanging data with other nodes the result of the communication is divided into three different outcomes: success, neutral and failure.
 
         In the cases of success and failure the result is saved to be able to judge the quality of a node.
 
         This has influence on the probability that a certain node is selected as partner.
+      required:
+        - node
+        - syncs
+        - experience
+      properties:
+        node:
+          $ref: '#/components/schemas/Node'
+        syncs:
+          type: integer
+          description: The number of synchronization attempts the node had with the remote node.
+          example: 822
+        experience:
+          type: object
+          required:
+            - s
+            - f
+          properties:
+            s:
+              type: integer
+              description: The number of successful communications with the remote node.
+              example: 357
+            f:
+              type: integer
+              description: The number of failed communications with the remote node.
+              example: 0
     HarvestInfo:
       type: object
       description: >
