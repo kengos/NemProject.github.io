@@ -13,6 +13,8 @@ servers:
 paths:
   /heartbeat:
     get:
+      tags:
+        - NIS status
       summary: Determines if NIS is up and responsive.
       externalDocs:
         url: 'https://nemproject.github.io/#heart-beat-request'
@@ -47,6 +49,8 @@ paths:
             or is in a state where it can't serve requests.
   /status:
     get:
+      tags:
+        - NIS status
       operationId: status
       summary: Determines the status of NIS.
       parameters: []
@@ -98,7 +102,9 @@ paths:
                     example: status
   /account/generate:
     get:
-      summary: |
+      tags:
+        - Account
+      summary: >
         Generates a KeyPairViewModel.
         * local only *
       parameters: []
@@ -132,6 +138,8 @@ paths:
                       c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3
   /account/get:
     get:
+      tags:
+        - Account
       summary: Requesting the account data
       description: Gets an AccountMetaDataPair for an account.
       externalDocs:
@@ -150,6 +158,8 @@ paths:
                 "$ref": "#/components/schemas/AccountMetaDataPair"
   /account/get/from-public-key:
     get:
+      tags:
+        - Account
       summary: |
         Retrieve the account data by providing the public key for the account:
       description: Gets an AccountMetaDataPair for an account.
@@ -167,6 +177,8 @@ paths:
                 "$ref": "#/components/schemas/AccountMetaDataPair"
   /account/get/forwarded:
     get:
+      tags:
+        - Account
       summary: Requesting the original account data for a delegate account
       description: >
         Given a delegate (formerly known as remote) account's address, gets the AccountMetaDataPair for the account for which the given account is the delegate account. If the given account address is not a delegate account for any account, the request returns the AccountMetaDataPair for the given address.
@@ -184,6 +196,8 @@ paths:
                 "$ref": "#/components/schemas/AccountMetaDataPair"
   /account/status:
     get:
+      tags:
+        - Account
       summary: Requesting the account status
       description: >
         Gets the AccountMetaData from an account.
@@ -202,6 +216,8 @@ paths:
                 $ref: "#/components/schemas/AccountMetaDataPair"
   /account/transfers/incoming:
     get:
+      tags:
+        - Account
       summary: Incoming transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
@@ -243,6 +259,8 @@ paths:
   # 3.1.5: outgoing
   /account/transfers/outgoing:
     get:
+      tags:
+        - Account
       summary: Outgoing transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
@@ -280,6 +298,8 @@ paths:
                   $ref: "#/components/schemas/TransactionMetaDataPair"
   /account/transfers/all:
     get:
+      tags:
+        - Account
       summary: Get all transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
@@ -317,6 +337,8 @@ paths:
                   $ref: "#/components/schemas/TransactionMetaDataPair"
   /account/transfers/unconfirmedTransactions:
     get:
+      tags:
+        - Account
       summary: Unconfirmed transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
@@ -353,6 +375,8 @@ paths:
   # TODO: 3.1.6 Transaction data with decoded messages
   /account/harvests:
     get:
+      tags:
+        - Account
       summary: Requesting harvest info data for an account
       externalDocs:
         url: https://nemproject.github.io/#requesting-harvest-info-data-for-an-account
@@ -382,6 +406,8 @@ paths:
                       $ref: "#/components/schemas/HarvestInfo"
   /account/importances:
     get:
+      tags:
+        - Account
       summary: Retrieving account importances for accounts
       externalDocs:
         url: https://nemproject.github.io/#retrieving-account-importances-for-accounts
@@ -401,6 +427,8 @@ paths:
                       $ref: "#/components/schemas/AccountImportanceViewModel"
   /account/namespace/page:
     get:
+      tags:
+        - Account
       summary: Retrieving namespaces that an account owns
       externalDocs:
         url: https://nemproject.github.io/#retrieving-namespaces-that-an-account-owns
@@ -445,6 +473,8 @@ paths:
                       $ref: "#/components/schemas/Namespace"
   /account/mosaic/definition/page:
     get:
+      tags:
+        - Account
       summary: Retrieving mosaic definitions that an account has created
       description: >
         Gets an array of mosaic definition objects for a given account address.
@@ -482,6 +512,8 @@ paths:
                       $ref: "#/components/schemas/MosaicDefinition"
   /account/mosaic/owned:
     get:
+      tags:
+        - Account
       summary: Retrieving mosaics that an account owns
       description: Gets an array of mosaic objects for a given account address.
       parameters:
@@ -505,6 +537,8 @@ paths:
   # FIXME
   /account/unlock:
     post:
+      tags:
+        - Account
       summary: Unlocking the account (enables harvesting) **Request cannot be performed in a browser.**
       description: Unlocks an account (starts harvesting).
       parameters:
@@ -521,6 +555,8 @@ paths:
   # FIXME
   /account/lock:
     post:
+      tags:
+        - Account
       summary: Locking the account (stops harvesting) **Request cannot be performed in a browser.**
       description: Locks an account (stops harvesting).
       parameters:
@@ -534,6 +570,8 @@ paths:
   # FIXME
   /account/unlocked/info:
     post:
+      tags:
+        - Account
       summary: Retrieving the unlock info **Request cannot be performed in a browser.**
       description: >
         Each node can allow users to harvest with their delegated key on that node.
@@ -558,6 +596,8 @@ paths:
   # 3.2 Retrieving historical account data
   /account/historical/get:
     get:
+      tags:
+        - Account
       summary: Retrieving historical account data
       externalDocs:
         url: https://nemproject.github.io/#retrieving-historical-account-data
@@ -605,6 +645,8 @@ paths:
   # 4.1.1 Block chain height
   /chain/height:
     get:
+      tags:
+        - Block chain
       summary: Get block chain height
       externalDocs:
         url: https://nemproject.github.io/#block-chain-height
@@ -620,6 +662,8 @@ paths:
   # 4.1.2 Block chain score
   /chain/score:
     get:
+      tags:
+        - Block chain
       summary: Get block chain score
       externalDocs:
         url: https://nemproject.github.io/#block-chain-score
@@ -640,6 +684,8 @@ paths:
   # 4.1.3
   /chain/last-block:
     get:
+      tags:
+        - Block chain
       summary: Get last block of the block chain score
       externalDocs:
         url: https://nemproject.github.io/#last-block-of-the-block-chain-score
@@ -656,6 +702,8 @@ paths:
   ## 4.2.1
   /block/at/public:
     post:
+      tags:
+        - Block chain
       summary: Getting a block with a given height
       externalDocs:
         url: https://nemproject.github.io/#getting-a-block-with-a-given-height
@@ -676,6 +724,8 @@ paths:
   ## 4.2.2
   /local/chain/blocks-after:
     post:
+      tags:
+        - Block chain
       summary: Getting part of a chain
       externalDocs:
         url: https://nemproject.github.io/#getting-part-of-a-chain
@@ -698,7 +748,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Block"
-
+  # 5
+  ## 5.1
+  ### 5.1.1
+  /node/info:
+    get:
+      summary: Get basic node information
+      tags:
+        - node
+      externalDocs:
+        url: https://nemproject.github.io/#basic-node-information
+      description: Gets basic information about a node. Using IP 127.0.0.1 gets information about the local node.
+      parameters: []
+      responses:
+        200:
+          description: basic node information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Node"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -1741,6 +1809,79 @@ components:
           type: integer
           description: The height at which the ownership begins.
           example: 13465
+    # 9.32
+    Node:
+      type: object
+      description: >
+        Nodes are the entities that perform communication in the network like sending and receiving data.
+
+        A node has an identity which is tied to an account through which the node can identify itself to the network.
+
+        The communication is done through the endpoint of the node. Additionally a node provides meta data information.
+      properties:
+        metaData:
+          type: object
+          description: Denotes the beginning of the meta data substructure.
+          properties:
+            features:
+              type: integer
+              description: The number of features the nodes has.
+              example: 1
+            networkId:
+              type: integer
+              description: >
+                The network id. The following network ids are supported:
+
+                * `104 (hex 0x68)` - The main network id.
+
+                * `96 (hex 0x60)` - The mijin network id.
+
+                * `152 (hex 0x98)` - The test network id. (FIXME)
+              example: -104
+            application:
+              type: string
+              description: The name of the application that is running the node.
+              example: NIS
+            version:
+              type: string
+              description: The version of the application.
+              example: 0.4.30-BETA
+            platform:
+              type: string
+              description: The underlying platform (OS, java version).
+              example: Oracle Corporation (1.8.0_05) on Windows 8.1
+        endpoint:
+          type: object
+          descriptoin: Denotes the beginning of the endpoint substructure.
+          properties:
+            protocol:
+              type: string
+              enum:
+                - http
+                - https
+              description: The protocol used for the communication (HTTP or HTTPS).
+              example: http
+            port:
+              type: integer
+              description: The port used for the communication.
+              example: 7890
+            host:
+              type: string
+              description: The IP address of the endpoint.
+              example: 85.25.36.97
+        identity:
+          type: object
+          description: Denotes the beginning of the identity substructure.
+          properties:
+            name:
+              type: string
+              description: The name of the node.
+              example: Hi, I am Alice2
+            public-key:
+              type: string
+              description: The public key used to identify the node.
+              example: 3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350
+
     # 9.34
     PrivateKey:
       type: object
