@@ -427,6 +427,7 @@ paths:
           description: (optional) namespace database id up to which namespaces are returned.
           example: 71245
         - name: pageSize
+          in: query
           required: false
           description: (optional) number of namespaces to be returned.
           example: 25
@@ -442,7 +443,43 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Namespace"
+  /account/mosaic/definition/page:
+    get:
+      summary: Retrieving mosaic definitions that an account has created
+      description: >
+        Gets an array of mosaic definition objects for a given account address.
 
+        The parent parameter is optional.
+
+        If supplied, only mosaic definitions for the given parent namespace are returned.
+
+        The id parameter is optional and allows retrieving mosaic definitions in batches of 25 mosaic definitions.
+
+        For more information how to use the id see Incoming transactions.
+      parameters:
+        - name: address
+          in: query
+          description: The address of the account.
+          example: TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH
+        - name: parent
+          in: query
+          description: (optional) parent namespace id.
+          example: makoto.metal.coins
+        - name: id
+          in: query
+          description: (optional) mosaic definition database id up to which mosaic definitions are returned.
+      responses:
+        200:
+          description: an array of MosaicDefinition
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MosaicDefinition"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -957,6 +994,136 @@ components:
     Transaction:
       type: object
       description: TODO
+    # 9.21
+    MosaicDefinition:
+      type: object
+      description: >
+        A mosaic definition describes an asset class.
+
+        Some fields are mandatory while others are optional.
+
+        The properties of a mosaic definition always have a default value and only need to be supplied if they differ from the default value.
+      properties:
+        creator:
+          type: string
+          description: The public key of the mosaic definition creator.
+          example: 10cfe522fe23c015b8ab24ef6a0c32c5de78eb55b2152ed07b6a092121187100
+        id:
+          $ref: "#/components/schemas/MosicId"
+        description:
+          type: string
+          description: The mosaic description. The description may have a length of up to 512 characters and cannot be empty.
+          example: A healthy drink with lots of vitamins
+        properties:
+          $ref: "#/components/schemas/MosaicProperties"
+        levy:
+          $ref: "#/components/schemas/MosaicLevy"
+    # 9.23
+    MosaicProperties:
+      type: object
+      description: >
+        Each mosaic definition comes with a set of properties.
+
+        Each property has a default value which will be applied in case it was not specified.
+
+        Future release may add additional properties to the set of available properties.
+
+        The available properties and their default values are:
+
+        * `divisibility` -
+
+          defines the smallest sub-unit that a mosaic can be divided into.
+
+          A divisibility of 0 means that only entire units can be transferred while a divisibility of 3 means the mosaic can be transferred in milli-units.
+
+        * `initialSupply` -
+
+          defines how many units of the mosaic are initially created.
+
+          These mosaics are credited to the creator of the mosaic.
+
+          The initial supply has an upper limit of 9,000,000,000 units.
+
+        * `supplyMutable` -
+
+          determines whether or not the supply can be changed by the creator at a later point using a MosaicSupplyChangeTransaction.
+
+          Possible values are "true" and "false",
+
+          the former meaning the supply can be changed and the latter that the supply is fixed for all times.
+
+        * `transferable` -
+
+          determines whether or not the a mosaic can be transferred to a user other than the creator.
+
+          In certain scenarios it is not wanted that user are able to trade the mosaic
+
+          (for example when the mosaic represents bonus points which the company does not want to be tranferable to other users).
+
+          Possible values are "true" and "false", the former meaning the mosaic can be arbitrarily transferred among users and the latter meaning the mosaic can only be transferred to and from the creator.
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          description: 	The name of the mosaic property.
+          enum:
+            - divisibility
+            - initialSupply
+            - supplyMutable
+            - transferable
+        value:
+          type: string
+          description: The value of the mosaic property.
+    # 9.24
+    MosaicLevy:
+      type: object
+      description: >
+        A mosaic definition can optionally specify a levy for transferring those mosaics.
+
+        This might be needed by legal entities needing to collect some taxes for transfers.
+      properties:
+        type:
+          type: integer
+          enum:
+            - 1
+            - 2
+          description: >
+            The levy type. The following types are supported:
+
+            * `1` - The levy is an absolute fee.
+
+              The field 'fee' states how many sub-units of the specified mosaic will be transferred to the recipient.
+
+            * `2` - The levy is calculated from the transferred amount.
+
+              The field 'fee' states how many percentiles of the transferred quantity will transferred to the recipient.
+          example: 1
+        recipient:
+          type: string
+          description: The recipient of the levy.
+          example: TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH
+        mosaicId:
+          $ref: "#/components/schemas/MosicId"
+        fee:
+          type: integer
+          description: The mosaic in which the levy is paid.
+          example: 1000
+    # 9.25
+    MosicId:
+      type: object
+      description: >
+        A mosaic id uniquely identifies an underlying mosaic definition.
+      properties:
+        namespaceId:
+          type: string
+          description: The corresponding namespace id. See the description of the structure Namespace. for details.
+          example: alice.drinks
+        name:
+          type: string
+          description: The name of the mosaic definition.
+          example: orange juice
     # 9.26
     Namespace:
       type: object
