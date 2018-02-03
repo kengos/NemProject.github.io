@@ -1,0 +1,892 @@
+openapi: 3.0.0
+info:
+  title: NEM NIS API Documentation
+  version: "1.22"
+  contact: {}
+servers:
+  - url: 'http://104.128.226.60:7890'
+    description: Testnet server
+  - url: 'http://alice6.nem.ninja:7890'
+    description: Mainnet server
+  - url: 'http://127.0.0.1:7890'
+    description: Local server
+paths:
+  /heartbeat:
+    get:
+      summary: Determines if NIS is up and responsive.
+      externalDocs:
+        url: 'https://nemproject.github.io/#heart-beat-request'
+      parameters: []
+      responses:
+        '200':
+          description: NIS is up
+          headers: null
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - type
+                  - message
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 1
+                  type:
+                    type: integer
+                    format: int32
+                    example: 2
+                  message:
+                    type: string
+                    example: ok
+        default:
+          description: >-
+            If there is no response to this request, NIS is either not running
+            or is in a state where it can't serve requests.
+  /status:
+    get:
+      operationId: status
+      summary: Determines the status of NIS.
+      parameters: []
+      responses:
+        '200':
+          description: NIS is up
+          content:
+            application/json:
+              schema:
+                required:
+                  - code
+                  - type
+                  - message
+                properties:
+                  code:
+                    type: interger
+                    format: int32
+                    enum:
+                      - 0
+                      - 1
+                      - 2
+                      - 3
+                      - 4
+                      - 5
+                      - 6
+                      - 7
+                      - 8
+                    example: 6
+                    description: >
+                      * `0` - Unknown status.
+                      * `1` - NIS is stopped.
+                      * `2` - NIS is starting.
+                      * `3` - NIS is running.
+                      * `4` - NIS is booting the local node (implies NIS is
+                      running).
+                      * `5` - The local node is booted (implies NIS is running).
+                      * `6` - The local node is synchronized (implies NIS is
+                      running and the local node is booted).
+                      * `7` - NIS local node does not see any remote NIS node
+                      (implies running and booted).
+                      * `8` - NIS is currently loading the block chain from the
+                      database. In this state NIS cannot serve any requests.
+                  type:
+                    type: integer
+                    format: int32
+                    example: 4
+                  message:
+                    type: string
+                    example: status
+  /account/generate:
+    get:
+      summary: |
+        Generates a KeyPairViewModel.
+        * local only *
+      parameters: []
+      responses:
+        '200':
+          description: return new account data
+          content:
+            application/json:
+              schema:
+                required:
+                  - privateKey
+                  - publicKey
+                  - address
+                properties:
+                  privateKey:
+                    type: string
+                    description: >-
+                      The private key of the account as hexadeciaml string.
+                    example: >-
+                      0962c6505d02123c40e858ff8ef21e2b7b5466be12c4770e3bf557aae828390f
+                  publicKey:
+                    type: string
+                    description: The public key of the account as hexadeciaml string.
+                    example: >-
+                      c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3
+                  address:
+                    type: string
+                    description: |
+                      The address of the account.
+                    example: >-
+                      c2e19751291d01140e62ece9ee3923120766c6302e1099b04014fe1009bc89d3
+  /account/get:
+    get:
+      summary: Requesting the account data
+      description: Gets an AccountMetaDataPair for an account.
+      externalDocs:
+        url: 'https://nemproject.github.io/#requesting-the-account-data'
+      parameters:
+        - name: address
+          in: query
+          required: true
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AccountMetaDataPair"
+  /account/get/from-public-key:
+    get:
+      summary: |
+        Retrieve the account data by providing the public key for the account:
+      description: Gets an AccountMetaDataPair for an account.
+      parameters:
+        - name: publicKey
+          in: path
+          required: true
+          description: The public key of the account as hex string.
+          example: f9bd190dd0c364261f5c8a74870cc7f7374e631352293c62ecc437657e5de2cd
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AccountMetaDataPair"
+  /account/get/forwarded:
+    get:
+      summary: Requesting the original account data for a delegate account
+      description: >
+        Given a delegate (formerly known as remote) account's address, gets the AccountMetaDataPair for the account for which the given account is the delegate account. If the given account address is not a delegate account for any account, the request returns the AccountMetaDataPair for the given address.
+      parameters:
+        - name: address
+          in: path
+          required: true
+          description: The address of the delegate account.
+          example: NC2ZQKEFQIL3JZEOB2OZPWXWPOR6LKYHIROCR7PK
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AccountMetaDataPair"
+  /account/status:
+    get:
+      summary: Requesting the account status
+      description: >
+        Gets the AccountMetaData from an account.
+      parameters:
+        - name: address
+          in: path
+          required: true
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountMetaDataPair"
+  /account/transfers/incoming:
+    get:
+      summary: Incoming transactions
+      externalDocs:
+        url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
+      description: >
+        A transaction is said to be incoming with respect to an account
+        if the account is the recipient of the transaction.
+
+        In the same way outgoing transaction are the transactions where the account is the sender of the transaction.
+
+        Unconfirmed transactions are those transactions that have not yet been included in a block.
+
+        Unconfirmed transactions are not guaranteed to be included in any block.
+      parameters:
+        - name: address
+          in: query
+          required: true
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+        - name: hash
+          in: query
+          required: false
+          description: The 256 bit sha3 hash of the transaction up to which transactions are returned.
+          example: 949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2
+        - name: id
+          in: query
+          required: false
+          description: The transaction id up to which transactions are returned.
+          example: 71245
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 25
+                items:
+                  $ref: "#/components/schemas/TransactionMetaDataPair"
+  # 3.1.5: outgoing
+  /account/transfers/outgoing:
+    get:
+      summary: Outgoing transactions
+      externalDocs:
+        url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
+      description: >
+        Gets an array of transaction meta data pairs where the recipient has the address given as parameter to the request.
+
+        A maximum of 25 transaction meta data pairs is returned.
+
+        For details about sorting and discussion of the second parameter see Incoming transactions.
+      parameters:
+        - name: address
+          in: query
+          required: true
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+        - name: hash
+          in: query
+          required: false
+          description: The 256 bit sha3 hash of the transaction up to which transactions are returned.
+          example: 949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2
+        - name: id
+          in: query
+          required: false
+          description: The transaction id up to which transactions are returned.
+          example: 71245
+      responses:
+        200:
+          description: an array of transaction meta data pairs
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 25
+                items:
+                  $ref: "#/components/schemas/TransactionMetaDataPair"
+  /account/transfers/all:
+    get:
+      summary: Get all transactions
+      externalDocs:
+        url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
+      description: >
+        Gets an array of transaction meta data pairs for which an account is the sender or receiver.
+
+        A maximum of 25 transaction meta data pairs is returned.
+
+        For details about sorting and discussion of the second parameter see Incoming transactions.
+      parameters:
+        - name: address
+          in: query
+          required: true
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+        - name: hash
+          in: query
+          required: false
+          description: The 256 bit sha3 hash of the transaction up to which transactions are returned.
+          example: 949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2
+        - name: id
+          in: query
+          required: false
+          description: The transaction id up to which transactions are returned.
+          example: 71245
+      responses:
+        200:
+          description: an array of transaction meta data pairs
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 25
+                items:
+                  $ref: "#/components/schemas/TransactionMetaDataPair"
+  /account/transfers/unconfirmedTransactions:
+    get:
+      summary: Unconfirmed transactions
+      externalDocs:
+        url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
+      description: >
+        Gets the array of transactions for which an account is the sender or receiver and which have not yet been included in a block.
+
+        The returned structure is UnconfirmedTransactionMetaDataPair see Appendix A: UnconfirmedTransactionMetaDataPair
+      parameters:
+        - name: address
+          in: query
+          required: true
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+        - name: hash
+          in: query
+          required: false
+          description: The 256 bit sha3 hash of the transaction up to which transactions are returned.
+          example: 949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2
+        - name: id
+          in: query
+          required: false
+          description: The transaction id up to which transactions are returned.
+          example: 71245
+      responses:
+        200:
+          description: an array of transaction meta data pairs
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 25
+                items:
+                  $ref: "#/components/schemas/TransactionMetaDataPair"
+  # TODO: 3.1.6 Transaction data with decoded messages
+  /account/harvests:
+    get:
+      summary: Requesting harvest info data for an account
+      exnternalDocs:
+        url: https://nemproject.github.io/#requesting-harvest-info-data-for-an-account
+      description: Gets an array of harvest info objects for an account.
+      parameters:
+        - name: address
+          in: query
+          required: true
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+        - name: hash
+          in: query
+          required: true
+          description: The 256 bit sha3 hash of the block up to which harvested blocks are returned.
+          example: 949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2
+      responses:
+        200:
+          description: HarvestInfo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/HarvestInfo"
+components:
+  schemas:
+    AccountHistoricalDataViewModel:
+      type: object
+      description: >
+        Nodes can support a feature for retrieving historical data of accounts.
+        If a node supports this feature, it will return an array of AccountHistoricalDataViewModel objects.
+      properties:
+        height:
+          type: integer
+          description: 	The height for which the data is valid.
+          example: 8976
+        address:
+          type: string
+          description: The address of the account.
+        balance:
+          type: integer
+          description: The balance of the account.
+        vestedBalance:
+          type: integer
+          description: The vested part of the balance.
+        unvestedBalance:
+          type: integer
+          description: The unvested part of the balance.
+        importance:
+          type: number
+          description: The importance of the account.
+        pageRank:
+          type: number
+          description: The page rank part of the importance.
+    AccountImportanceViewModel:
+      type: object
+      description: >
+        Each account is assigned an importance in the NEM network.
+        The ability of an account to generate new blocks is proportional to its importance.
+        The importance is a number between 0 and 1.
+      properties:
+        address:
+          type: string
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+        importance:
+          type: object
+          description: Substructure that describes the importance of the account.
+          properties:
+            isSet:
+              type: integer
+              enum:
+                - 1
+                - 0
+              example: 1
+              description: >
+                Indicates if the fields "score", "ev" and "height" are available.isSet can have the values 0 or 1.
+                In case isSet is 0 the fields are not available.
+            score:
+              type: number
+              example: 0.0011561555164258449
+              description: The importance of the account. The importance ranges between 0 and 1.
+            ev:
+              type: number
+              example: 0.004367936531009263
+              description: The page rank portion of the importance. The page rank ranges between 0 and 1.
+            height:
+              type: integer
+              example: 38413
+              description: The height at which the importance calculation was performed.
+    AccountInfo:
+      type: object
+      properties:
+        address:
+          type: string
+          description: The address of the account.
+          example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
+        balance:
+          type: integer
+          description: The balance of the account in micro NEM.
+          example: 124446551689680
+        vestedBalance:
+          type: integer
+          description: The vested part of the balance of the account in micro NEM.
+          example: 1041345514976241
+        importance:
+          type: number
+          description: The importance of the account.
+          example: 0.010263666447108395
+        publicKey:
+          type: string
+          description: The public key of the account.
+          example: a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a
+        label:
+          type: string
+          description: The label of the account (not used, always null).
+          example: null
+        harvestedBlocks:
+          type: integer
+          description: The number blocks that the account already harvested.
+        multisigInfo:
+          type: string
+          description: TODO
+    AccountMetaData:
+      properties:
+        status:
+          type: string
+          enum:
+            - UNKNOWN
+            - LOCKED
+            - UNLOCKED
+          description: >
+            The harvesting status of a queried account.
+
+            The harvesting status can be one of the following values:
+
+            * `UNKNOWN` - The harvesting status of the account is not known.
+
+            * `LOCKED` - The account is not harvesting.
+
+            * `UNLOCKED` -  The account is harvesting.
+          example: LOCKED
+        remoteStatus:
+          type: string
+          enum:
+            - REMOTE
+            - ACTIVATING
+            - ACTIVE
+            - DEACTIVATING
+            - INACTIVE
+          description: >
+            The status of remote harvesting of a queried account.
+
+            The remote harvesting status can be one of the following values:
+
+            * `REMOTE` - The account is a remote account and therefore remoteStatus is not applicable for it.
+
+            * `ACTIVATING` - The account has activated remote harvesting but it is not yet active.
+
+            * `ACTIVE` - The account has activated remote harvesting and remote harvesting is active.
+
+            * `DEACTIVATING` - The account has deactivated remote harvesting but remote harvesting is still active.
+
+            * `INACTIVE` - The account has inactive remote harvesting, or it has deactivated remote harvesting and deactivation is operational.
+        cosignatoryOf:
+          type: Array
+          description: >
+            JSON array of AccountInfo structures. The account is cosignatory for each of the accounts in the array.
+          items:
+            $ref: "#/components/schemas/AccountInfo"
+          example: []
+        cosignatories:
+          type: Array
+          description: >
+            JSON array of AccountInfo structures. The array holds all accounts that are a cosignatory for this account.
+          items:
+            $ref: "#/components/schemas/AccountInfo"
+          example: []
+    AccountMetaDataPair:
+      type: object
+      required:
+        - account
+        - meta
+      properties:
+        account:
+          $ref: "#/components/schemas/AccountInfo"
+        meta:
+          $ref: "#/components/schemas/AccountMetaData"
+    AccountPrivateKeyTransactionsPage:
+      type: object
+      description: >
+        The account private key transactions page contains data that NIS needs to retrieve a set of transactions from the database.
+        The data includes the private key of the account for which transactions are retrieved.
+        Use requests that use this structure only when NIS is running locally.
+
+        The fields "hash" and "id" are optional.
+      required:
+        - value
+      properties:
+        value:
+          type: string
+          example: 68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0
+          description: The private key as hexadecimal string.
+        hash:
+          type: string
+          example: 44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039
+          description: The optional hash value.
+        id:
+          type: string
+          example: 12345
+          description: The optional transaction id.
+    ApplicationMetaData:
+      type: object
+      description: The application meta data object supplies additional information about the application running on a node.
+      properties:
+        currentTime:
+          type: integer
+          example: 9189086
+          description: >
+            The current network time, i.e. the number of seconds that have elapsed since the creation of the nemesis block.
+        application:
+          type: string
+          example: NEM Infrastructure Server
+          description: The name of the application running on the node.
+        startTime:
+          type: integer
+          example: 9060202
+          description: The network time when the application was started.
+        version:
+          type: string
+          example: 0.4.30-BETA
+          description: The application version.
+        signer:
+          type: string
+          example: 9189086
+          description: CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD
+    AuditCollection:
+      type: object
+      description: >
+        An audit collection consists of two arrays, containing information about incoming requests from other nodes.
+
+        The first array contains information about outstanding (i.e. not yet processed requests)
+
+        and the second array contains information about the most recent requests.
+
+        The audit collection is for debug purposes.
+      properties:
+        outstanding:
+          type: object
+          properties:
+            path:
+              type: string
+              description: The relative URL path.
+              example: /chain/score
+            start-time:
+              type: integer
+              description: The number of seconds elapsed since the creation of the nemesis block.
+              example: 9020618
+            host:
+              type: string
+              description: The host which initiated the request.
+              example: 86.124.91.183
+            elapsed-time:
+              type: integer
+              description: The time in seconds that has elapsed since the request was received.
+              example: 5
+            id:
+              type: integer
+              description: The unique id of the request.
+              example: 797725
+        most-recent:
+          type: object
+          properties:
+            path:
+              type: string
+              description: The relative URL path.
+              example: /push/transaction
+            start-time:
+              type: integer
+              description: The number of seconds elapsed since the creation of the nemesis block.
+              example: 9020621
+            host:
+              type: string
+              description: The host which initiated the request.
+              example: hachi.nem.ninja
+            elapsed-time:
+              type: integer
+              description: The time in seconds that has elapsed since the request was received.
+              example: 2
+            id:
+              type: integer
+              description: The unique id of the request.
+              example: 797750
+    Block:
+      type: object
+      description: >
+        A block is the structure that contains the transaction information.
+
+        A block can contain up to 120 transactions.
+
+        Blocks are generated and signed by accounts and are the instrument by which information is spread in the network.
+      properties:
+        timeStamp:
+          type: integer
+          description: The number of seconds elapsed since the creation of the nemesis block.
+          example: 9022656
+        signature:
+          type:
+          description: >
+            The signature of the block.
+
+            The signature was generated by the signer and can be used to validate that the block data was not modified by a node.
+          example:
+        prevBlockHash:
+          type: object
+          properties:
+            data:
+              type: string
+              description: The sha3-256 hash of the last block as hex-string.
+              example: 0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b
+        type:
+          type: integer
+          enum:
+            - -1
+            - 1
+          description: >
+            The block type. There are currently two block types used:
+            * `-1` - Only the nemesis block has this type.
+            * `1` - Regular block type.
+          example: 1
+        transactions:
+          type: array
+          description: >
+            The array of transaction structures.
+
+            See Appendix A: Transaction for more details about this structure.
+          items:
+            $ref: '#/components/schemas/Transaction'
+        version:
+          type: integer
+          description: >
+            The block version. The following versions are supported.
+
+            * 0x68 << 24 + 1 (1744830465 as 4 byte integer): the main network version
+
+            * 0x60 << 24 + 1 (1610612737 as 4 byte integer): the mijin network version
+
+            * 0x98 << 24 + 1 (-1744830463 as 4 byte integer): the test network version
+          example: 1744830465
+        signer:
+          type: string
+          description: The public key of the harvester of the block as hexadecimal number.
+          example: The public key of the harvester of the block as hexadecimal number.
+        height:
+          type: integer
+          description: The height of the block. Each block has a unique height. Subsequent blocks differ in height by 1.
+          example: 39324
+    BlockChainScore:
+      type: object
+      description: The block chain score is a measure how good the block chain is. The higher the score, the better the block chain is.
+      required:
+        - score
+      properties:
+        score:
+          type: string
+          description: The score is an integer greater or equal to zero. It is submitted in hexadecimal format.
+          example: 17a3077c927d9a7e
+    BlockHeight:
+      type: object
+      description: >
+        The block height describes the position of the block within the block chain.
+
+        The first block of the chain has height one.
+
+        Each subsequent block has a height which is one higher than the previous block.
+      required:
+        - height
+      properties:
+        height:
+          type: integer
+          description: The height is an integer greater than zero.
+          example: 2649
+    BootNodeRequest:
+      type: object
+      description: >
+        The BootNodeRequest JSNON object is used to transfer the relevant data for booting a local node to NIS.
+
+        With the boot data NIS can create the local node object and connect to the network.
+      required:
+        - metaData
+        - endpoint
+        - identity
+      properties:
+        metaData:
+          type: object
+          description: Denotes the beginning of the metaData substructure.
+          properties:
+            application:
+              type: string
+              description: The application name.
+              example: 'NIS'
+        endpoint:
+          type: object
+          description: Denotes the beginning of the endpoint substructure.
+          properties:
+            protocol:
+              type: string
+              description: The protocol to use (only HTTP supported as for now).
+              example: http
+            port:
+              type: integer
+              description: The port to use.
+              example: 7890
+            host:
+              type: string
+              description: The IP address to use.
+              example: localhost
+        identity:
+          type: object
+          description: Denotes the fof the identity substructure.
+          properties:
+            private-key:
+              type: string
+              description: The private key used for creating the identity.
+              example: a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f
+            name:
+              type: string
+              description: The name of the node (can be anything).
+              example: Alice
+    CommunicationTimeStamps:
+      type: object
+      description: >
+        Communication timestamps contain information about the network time of a remote NIS.
+
+        NEM uses a time synchronization mechanism to synchronize time across the network.
+
+        Each node maintains a network time which is the time of the computer clock plus an offset
+        which compensates for the deviation from the computer clocks of other nodes.
+      required:
+        - sendTimeStamp
+        - receiveTimeStamp
+      properties:
+        sendTimeStamp:
+          type: integer
+          description: The network time at the moment the reply was sent.
+          example: 9145477789
+        receiveTimeStamp:
+          type: integer
+          description: The network time at the moment the request was received.
+          example: 9145477789
+    # TODO: 9.14
+    ExplorerBlockViewModel:
+      type: object
+      description: >
+        The following structure is used by the NEM block chain explorer for convenience reason.
+
+        The data is similar but not identical to that of a Block.
+    # TODO: 9.15
+    ExplorerTransferViewModel:
+      type: object
+      description: >
+        The following structure is used by the NEM block chain explorer for convenience reason.
+
+        The data is similar but not identical to that of a Transaction structure.
+    # TODO: 9.16
+    ExtendedNodeExperiencePair:
+      type: object
+      description: >
+        When exchanging data with other nodes the result of the communication is divided into three different outcomes: success, neutral and failure.
+
+        In the cases of success and failure the result is saved to be able to judge the quality of a node.
+
+        This has influence on the probability that a certain node is selected as partner.
+    HarvestInfo:
+      type: object
+      description: >
+        A HarvestInfo object contains information about a block that an account harvested.
+      properties:
+        timeStamp:
+          type: integer
+          description: The number of seconds elapsed since the creation of the nemesis block.
+          example: 8963798
+        id:
+          type: integer
+          description: The database id for the harvested block.
+          example: 254378
+        difficulty:
+          type: integer
+          description: >
+            The block difficulty. The initial difficulty was set to 100000000000000.
+
+            The block difficulty is always between one tenth and ten times the initial difficulty.
+          example: 46534789865332
+        totalFee:
+          type: integer
+          description: The total fee collected by harvesting the block.
+          example: 2041299054
+        height:
+          type: integer
+          description: The height of the harvested block.
+          example: 38453
+    TransactionMetaDataPair:
+      type: object
+      required:
+        - meta
+        - transaction
+      properties:
+        meta:
+          $ref: "#/components/schemas/TransactionMetaData"
+        transaction:
+          $ref: "#/components/schemas/Transaction"
+    TransactionMetaData:
+      type: object
+      required:
+        - height
+        - id
+        - hash
+      properties:
+        height:
+          type: integer
+          description: The height of the block in which the transaction was included.
+          example: 40706
+        id:
+          type: integer
+          description: The id of the transaction.
+        hash:
+          type: object
+          properties:
+            data:
+              type: string
+              description: The transaction hash.
+    Transaction:
+      type: object
+      description: TODO
