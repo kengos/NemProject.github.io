@@ -767,6 +767,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Node"
+  ### 5.1.2
+  /node/extended-info:
+    get:
+      summary: Get extended node information
+      tags:
+        - node
+      externalDocs:
+        url: https://nemproject.github.io/#extended-node-information
+      description: Gets extended information about a node. Using IP 127.0.0.1 gets extended information about the local node.
+      parameters: []
+      responses:
+        200:
+          description: NisNodeInfo object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NisNodeInfo"
 components:
   schemas:
     AccountHistoricalDataViewModel:
@@ -1809,6 +1826,19 @@ components:
           type: integer
           description: The height at which the ownership begins.
           example: 13465
+    # 9.31
+    NisNodeInfo:
+      type: object
+      description: >
+        The NisNodeInfo object provides detailed information about a node.
+      required:
+        - node
+        - nisInfo
+      properties:
+        node:
+          $ref: "#/components/schemas/Node"
+        nisInfo:
+          $ref: "#/components/schemas/ApplicationMetaData"
     # 9.32
     Node:
       type: object
@@ -1881,6 +1911,7 @@ components:
               type: string
               description: The public key used to identify the node.
               example: 3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350
+    # 9.33
 
     # 9.34
     PrivateKey:
