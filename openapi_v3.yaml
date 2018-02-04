@@ -20,8 +20,8 @@ paths:
         url: 'https://nemproject.github.io/#heart-beat-request'
       parameters: []
       responses:
-        '200':
-          description: NemRequestHeartbeatResult object
+        200:
+          description: return a NemRequestHeartbeatResult object
           content:
             application/json:
               schema:
@@ -32,41 +32,45 @@ paths:
             or is in a state where it can't serve requests.
   /status:
     get:
+      summary: Determines the status of NIS.
       tags:
         - NIS status
-      operationId: status
-      summary: Determines the status of NIS.
+      externalDocs:
+        url: https://nemproject.github.io/#status-request
       parameters: []
       responses:
-        '200':
-          description: NemRequestStatusResult object
+        200:
+          description: return a NemRequestStatusResult object
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/NemRequestStatusResult"
   /account/generate:
     get:
+      summary: Generating new account data
       tags:
         - Account
-      summary: >
+      externalDocs:
+        url: https://nemproject.github.io/#generating-new-account-data
+      description: |
         Generates a KeyPairViewModel.
-        * local only *
+        **local only**
       parameters: []
       responses:
-        '200':
-          description: return new account data
+        200:
+          description: return a KeyPairViewModel object
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/KeyPairViewModel"
   /account/get:
     get:
+      summary: Requesting the account data
       tags:
         - Account
-      summary: Requesting the account data
       description: Gets an AccountMetaDataPair for an account.
       externalDocs:
-        url: 'https://nemproject.github.io/#requesting-the-account-data'
+        url: https://nemproject.github.io/#requesting-the-account-data
       parameters:
         - name: address
           in: query
@@ -74,56 +78,97 @@ paths:
           description: The address of the account.
           example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
       responses:
-        '200':
+        200:
+          description: return a AccountMetaDataPair object
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccountMetaDataPair"
   /account/get/from-public-key:
     get:
+      summary: Requesting the account data from a public key
       tags:
         - Account
-      summary: |
-        Retrieve the account data by providing the public key for the account:
       description: Gets an AccountMetaDataPair for an account.
+      externalDocs:
+        url: https://nemproject.github.io/#requesting-the-account-data
       parameters:
         - name: publicKey
-          in: path
+          in: query
           required: true
           description: The public key of the account as hex string.
           example: f9bd190dd0c364261f5c8a74870cc7f7374e631352293c62ecc437657e5de2cd
       responses:
-        '200':
+        200:
           content:
+            description: return a AccountMetaDataPair object
             application/json:
               schema:
                 "$ref": "#/components/schemas/AccountMetaDataPair"
   /account/get/forwarded:
     get:
+      summary: Requesting the original account data for a delegate account
       tags:
         - Account
-      summary: Requesting the original account data for a delegate account
-      description: >
-        Given a delegate (formerly known as remote) account's address, gets the AccountMetaDataPair for the account for which the given account is the delegate account. If the given account address is not a delegate account for any account, the request returns the AccountMetaDataPair for the given address.
+      externalDocs:
+        url: https://nemproject.github.io/#requesting-the-original-account-data-for-a-delegate-account
+      description: |
+        Given a delegate (formerly known as remote) account's address,
+
+        gets the AccountMetaDataPair for the account for which the given account is the delegate account.
+
+        If the given account address is not a delegate account for any account,
+
+        the request returns the AccountMetaDataPair for the given address.
       parameters:
         - name: address
-          in: path
+          in: query
           required: true
           description: The address of the delegate account.
           example: NC2ZQKEFQIL3JZEOB2OZPWXWPOR6LKYHIROCR7PK
       responses:
-        '200':
+        200:
+          description: return a AccountMetaDataPair object
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AccountMetaDataPair"
+  /account/get/forwarded/from-public-key:
+    get:
+      summary: Requesting the original account data for a delegate account from a public key
+      tags:
+        - Account
+      externalDocs:
+        url: https://nemproject.github.io/#requesting-the-original-account-data-for-a-delegate-account
+      description: |
+        Given a delegate (formerly known as remote) account's address,
+
+        gets the AccountMetaDataPair for the account for which the given account is the delegate account.
+
+        If the given account address is not a delegate account for any account,
+
+        the request returns the AccountMetaDataPair for the given address.
+      parameters:
+        - name: publicKey
+          in: query
+          required: true
+          description: The public key of the account as hex string.
+          example: bdd8dd702acb3d88daf188be8d6d9c54b3a29a32561a068b25d2261b2b2b7f02
+      responses:
+        200:
+          description: return a AccountMetaDataPair object
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/AccountMetaDataPair"
   /account/status:
     get:
+      summary: Requesting the account status
       tags:
         - Account
-      summary: Requesting the account status
-      description: >
-        Gets the AccountMetaData from an account.
+      externalDocs:
+        url: https://nemproject.github.io/#requesting-the-account-status
+      description: Gets the AccountMetaData from an account.
       parameters:
         - name: address
           in: path
@@ -132,7 +177,7 @@ paths:
           example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
       responses:
         200:
-          description: OK
+          description: return a AccountMetaDataPair object
           content:
             application/json:
               schema:
@@ -141,7 +186,7 @@ paths:
     get:
       tags:
         - Account
-      summary: Incoming transactions
+      summary: Get incoming transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
       description: |
@@ -171,7 +216,7 @@ paths:
           example: 71245
       responses:
         200:
-          description: OK
+          description: return an array of TransactionMetaDataPair objects
           content:
             application/json:
               schema:
@@ -182,12 +227,12 @@ paths:
   # 3.1.5: outgoing
   /account/transfers/outgoing:
     get:
+      summary: Get outgoing transactions
       tags:
         - Account
-      summary: Outgoing transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
-      description: >
+      description: |
         Gets an array of transaction meta data pairs where the recipient has the address given as parameter to the request.
 
         A maximum of 25 transaction meta data pairs is returned.
@@ -211,7 +256,7 @@ paths:
           example: 71245
       responses:
         200:
-          description: an array of transaction meta data pairs
+          description: return an array of TransactionMetaDataPair objects
           content:
             application/json:
               schema:
@@ -221,9 +266,9 @@ paths:
                   $ref: "#/components/schemas/TransactionMetaDataPair"
   /account/transfers/all:
     get:
+      summary: Get all transactions
       tags:
         - Account
-      summary: Get all transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
       description: |
@@ -250,7 +295,7 @@ paths:
           example: 71245
       responses:
         200:
-          description: an array of transaction meta data pairs
+          description: return an array of TransactionMetaDataPair objects
           content:
             application/json:
               schema:
@@ -260,12 +305,12 @@ paths:
                   $ref: "#/components/schemas/TransactionMetaDataPair"
   /account/transfers/unconfirmedTransactions:
     get:
+      summary: Get unconfirmed transactions
       tags:
         - Account
-      summary: Unconfirmed transactions
       externalDocs:
         url: 'https://nemproject.github.io/#requesting-transaction-data-for-an-account'
-      description: >
+      description: |
         Gets the array of transactions for which an account is the sender or receiver and which have not yet been included in a block.
 
         The returned structure is UnconfirmedTransactionMetaDataPair see Appendix A: UnconfirmedTransactionMetaDataPair
@@ -287,7 +332,7 @@ paths:
           example: 71245
       responses:
         200:
-          description: an array of transaction meta data pairs
+          description: return an array of UnconfirmedTransactionMetaDataPair objects
           content:
             application/json:
               schema:
@@ -295,12 +340,81 @@ paths:
                 maxItems: 25
                 items:
                   $ref: "#/components/schemas/UnconfirmedTransactionMetaDataPair"
-  # TODO: 3.1.6 Transaction data with decoded messages
-  /account/harvests:
-    get:
+  # FIXME
+  /local/account/transfers/incoming:
+    post:
+      summary: Get incoming transactions with decoded messages **local only**
       tags:
         - Account
+      externalDocs:
+        url: https://nemproject.github.io/#transaction-data-with-decoded-messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountPrivateKeyTransactionsPage"
+      responses:
+        200:
+          description: return an array of TransactionMetaDataPair objects
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 25
+                items:
+                  $ref: "#/components/schemas/TransactionMetaDataPair"
+  /local/account/transfers/outgoing:
+    post:
+      summary: Get outgoing transactions with decoded messages **local only**
+      tags:
+        - Account
+      externalDocs:
+        url: https://nemproject.github.io/#transaction-data-with-decoded-messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountPrivateKeyTransactionsPage"
+      responses:
+        200:
+          description: return an array of TransactionMetaDataPair objects
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 25
+                items:
+                  $ref: "#/components/schemas/TransactionMetaDataPair"
+  /local/account/transfers/all:
+    post:
+      summary: Get all transactions with decoded messages **local only**
+      tags:
+        - Account
+      externalDocs:
+        url: https://nemproject.github.io/#transaction-data-with-decoded-messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountPrivateKeyTransactionsPage"
+      responses:
+        200:
+          description: return an array of TransactionMetaDataPair objects
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 25
+                items:
+                  $ref: "#/components/schemas/TransactionMetaDataPair"
+  /account/harvests:
+    get:
       summary: Requesting harvest info data for an account
+      tags:
+        - Account
       externalDocs:
         url: https://nemproject.github.io/#requesting-harvest-info-data-for-an-account
       description: Gets an array of harvest info objects for an account.
@@ -312,12 +426,12 @@ paths:
           example: TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS
         - name: hash
           in: query
-          required: true
-          description: The 256 bit sha3 hash of the block up to which harvested blocks are returned.
+          required: false
+          description: (optional) The 256 bit sha3 hash of the block up to which harvested blocks are returned.
           example: 949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2
       responses:
         200:
-          description: HarvestInfo
+          description: return an array of HarvestInfo objects
           content:
             application/json:
               schema:
@@ -329,16 +443,16 @@ paths:
                       $ref: "#/components/schemas/HarvestInfo"
   /account/importances:
     get:
+      summary: Retrieving account importances for accounts
       tags:
         - Account
-      summary: Retrieving account importances for accounts
       externalDocs:
         url: https://nemproject.github.io/#retrieving-account-importances-for-accounts
       description: Gets an array of account importance view model objects.
       parameters: []
       responses:
         200:
-          description: AccountImportanceViewModel
+          description: return an array of AccountImportanceViewModel objects
           content:
             application/json:
               schema:
@@ -350,12 +464,12 @@ paths:
                       $ref: "#/components/schemas/AccountImportanceViewModel"
   /account/namespace/page:
     get:
+      summary: Retrieving namespaces that an account owns
       tags:
         - Account
-      summary: Retrieving namespaces that an account owns
       externalDocs:
         url: https://nemproject.github.io/#retrieving-namespaces-that-an-account-owns
-      description: >
+      description: |
         Gets an array of namespace objects for a given account address.
 
         The parent parameter is optional.
@@ -384,7 +498,7 @@ paths:
           example: 25
       responses:
         200:
-          description: Namespace
+          description: return an array of Namespace objects
           content:
             application/json:
               schema:
@@ -396,10 +510,12 @@ paths:
                       $ref: "#/components/schemas/Namespace"
   /account/mosaic/definition/page:
     get:
+      summary: Retrieving mosaic definitions that an account has created
       tags:
         - Account
-      summary: Retrieving mosaic definitions that an account has created
-      description: >
+      externalDocs:
+        url: https://nemproject.github.io/#retrieving-mosaic-definitions-that-an-account-has-created
+      description: |
         Gets an array of mosaic definition objects for a given account address.
 
         The parent parameter is optional.
@@ -423,7 +539,7 @@ paths:
           description: (optional) mosaic definition database id up to which mosaic definitions are returned.
       responses:
         200:
-          description: an array of MosaicDefinition
+          description: return an array of MosaicDefinition objects
           content:
             application/json:
               schema:
@@ -435,9 +551,11 @@ paths:
                       $ref: "#/components/schemas/MosaicDefinition"
   /account/mosaic/owned:
     get:
+      summary: Retrieving mosaics that an account owns
       tags:
         - Account
-      summary: Retrieving mosaics that an account owns
+      externalDocs:
+        url: https://nemproject.github.io/#retrieving-mosaics-that-an-account-owns
       description: Gets an array of mosaic objects for a given account address.
       parameters:
         - name: address
@@ -447,7 +565,7 @@ paths:
           example: TD3RXTHBLK6J3UD2BH2PXSOFLPWZOTR34WCG4HXH
       responses:
         200:
-          description: an array of mosaic objects
+          description: return an array of Mosaic objects
           content:
             application/json:
               schema:
@@ -460,43 +578,42 @@ paths:
   # FIXME
   /account/unlock:
     post:
+      summary: Unlocking the account (enables harvesting) **Request cannot be performed in a browser.**
       tags:
         - Account
-      summary: Unlocking the account (enables harvesting) **Request cannot be performed in a browser.**
+      externalDocs:
+        url: https://nemproject.github.io/#locking-and-unlocking-accounts
       description: Unlocks an account (starts harvesting).
-      parameters:
-        - name: privateKey
-          in: query
-          required: true
-          description: >
-            A PrivateKey JSON object as described in Appendix A: PrivateKey
-          schema:
-            $ref: "#/components/schemas/PrivateKey"
-      responses:
-        200:
-          description: FIXME
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrivateKey"
   # FIXME
   /account/lock:
     post:
+      summary: Locking the account (stops harvesting) **Request cannot be performed in a browser.**
       tags:
         - Account
-      summary: Locking the account (stops harvesting) **Request cannot be performed in a browser.**
+      externalDocs:
+        url: https://nemproject.github.io/#locking-and-unlocking-accounts
       description: Locks an account (stops harvesting).
-      parameters:
-        - name: privateKey
-          in: query
-          required: true
-          description: >
-            A PrivateKey JSON object as described in Appendix A: PrivateKey
-          schema:
-            $ref: "#/components/schemas/PrivateKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrivateKey"
   # FIXME
   /account/unlocked/info:
     post:
+      summary: Retrieving the unlock info **Request cannot be performed in a browser.**
       tags:
         - Account
-      summary: Retrieving the unlock info **Request cannot be performed in a browser.**
-      description: >
+      externalDocs:
+        url: https://nemproject.github.io/#locking-and-unlocking-accounts
+      description: |
         Each node can allow users to harvest with their delegated key on that node.
 
         The NIS configuration has entries for configuring the maximum number of allowed harvesters and optionally allow harvesting only for certain account addresses.
@@ -504,7 +621,7 @@ paths:
         The unlock info gives information about the maximum number of allowed harvesters and how many harvesters are already using the node.
       responses:
         200:
-          description: FIXME
+          description: return num-unlocked count and max-unlocked count
           content:
             application/json:
               schema:
@@ -519,12 +636,12 @@ paths:
   # 3.2 Retrieving historical account data
   /account/historical/get:
     get:
+      summary: Retrieving historical account data
       tags:
         - Account
-      summary: Retrieving historical account data
       externalDocs:
         url: https://nemproject.github.io/#retrieving-historical-account-data
-      description: >
+      description: |
         The configuration for NIS offers the possibility for a node to expose additional features that other nodes don't want to offer.
 
         One of those features is the supply of historical account data like balance and importance information.
@@ -541,14 +658,14 @@ paths:
           example: 17592
         - name: endHeight
           in: query
-          description: >
+          description: |
             The block height up to which the data should be supplied.
 
             The end height must be greater than or equal to the start height.
           example: 17592
         - name: increment
           in: query
-          description: >
+          description: |
             The value by which the height is incremented between each data point.
 
             The value must be greater than 0. NIS can supply up to 1000 data points with one request.
@@ -557,7 +674,7 @@ paths:
           example: 1
       responses:
         200:
-          description: an array of AccountHistoricalDataViewModel
+          description: return an array of AccountHistoricalDataViewModel objects
           content:
             application/json:
               schema:
@@ -568,9 +685,9 @@ paths:
   # 4.1.1 Block chain height
   /chain/height:
     get:
+      summary: Get block chain height
       tags:
         - Block chain
-      summary: Get block chain height
       externalDocs:
         url: https://nemproject.github.io/#block-chain-height
       description: Gets the current height of the block chain.
@@ -585,12 +702,12 @@ paths:
   # 4.1.2 Block chain score
   /chain/score:
     get:
+      summary: Get block chain score
       tags:
         - Block chain
-      summary: Get block chain score
       externalDocs:
         url: https://nemproject.github.io/#block-chain-score
-      description: >
+      description: |
         Gets the current score of the block chain.
 
         The higher the score, the better the chain.
@@ -607,9 +724,9 @@ paths:
   # 4.1.3
   /chain/last-block:
     get:
+      summary: Get last block of the block chain score
       tags:
         - Block chain
-      summary: Get last block of the block chain score
       externalDocs:
         url: https://nemproject.github.io/#last-block-of-the-block-chain-score
       description: Gets the current last block of the chain.
@@ -625,9 +742,9 @@ paths:
   ## 4.2.1
   /block/at/public:
     post:
+      summary: Getting a block with a given height
       tags:
         - Block chain
-      summary: Getting a block with a given height
       externalDocs:
         url: https://nemproject.github.io/#getting-a-block-with-a-given-height
       description: Gets a block from the chain that has the given height.
@@ -647,12 +764,12 @@ paths:
   ## 4.2.2
   /local/chain/blocks-after:
     post:
+      summary: Getting part of a chain
       tags:
         - Block chain
-      summary: Getting part of a chain
       externalDocs:
         url: https://nemproject.github.io/#getting-part-of-a-chain
-      description: >
+      description: |
         Gets up to 10 blocks after given block height from the chain.
 
         If the database contains less than 10 block after the given height, then less blocks are returned.
@@ -678,7 +795,7 @@ paths:
     get:
       summary: Get basic node information
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#basic-node-information
       description: Gets basic information about a node. Using IP 127.0.0.1 gets information about the local node.
@@ -695,7 +812,7 @@ paths:
     get:
       summary: Get extended node information
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#extended-node-information
       description: Gets extended information about a node. Using IP 127.0.0.1 gets extended information about the local node.
@@ -713,7 +830,7 @@ paths:
     get:
       summary: Get complete neighborhood
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#complete-neighborhood
       description: Gets an array of all known nodes in the neighborhood.
@@ -730,7 +847,7 @@ paths:
     get:
       summary: Get reachable neighborhood
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#reachable-neighborhood
       description: Gets an array of all nodes with status 'active' in the neighborhood.
@@ -752,7 +869,7 @@ paths:
     get:
       summary: Get active neighborhood
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#active-neighborhood
       description: Gets an array of active nodes in the neighborhood that are selected for broadcasts.
@@ -774,11 +891,12 @@ paths:
     get:
       summary: Get maximum chain height in the active neighborhood
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#maximum-chain-height-in-the-active-neighborhood
-      description: >-
+      description: |
         Requests the chain height from every node in the active node list (described in Active neighborhood)
+
         and returns the maximum height seen.
       parameters: []
       responses:
@@ -793,12 +911,14 @@ paths:
     get:
       summary: Requesting node experiences
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#requesting-node-experiences
-      description: >-
+      description: |
         Gets an array of node experiences from another node.
+
         Each node saves its experiences with other nodes in an internal map.
+
         Sharing experiences helps nodes to select honest nodes for communication.
       parameters: []
       responses:
@@ -811,9 +931,9 @@ paths:
   ## 5.4
   /node/boot:
     post:
-      summary: Booting the local node *local only*
+      summary: Booting the local node **local only**
       tags:
-        - node
+        - Node
       externalDocs:
         url: https://nemproject.github.io/#booting-the-local-node
       description: |
@@ -974,6 +1094,7 @@ paths:
         url: https://nemproject.github.io/#sending-the-data-to-NIS
       description: |
         Creates and broadcasts a transaction.
+
         **The private key is not involved.**
       requestBody:
         required: true
@@ -988,6 +1109,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NemAnnounceResult"
+        default:
+          description: return an ErrorObject
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
   # 8
   ## 8.1
   /debug/time-synchronization:
@@ -2533,13 +2660,11 @@ components:
             The transaction data as string.
             The string is created by first creating the corresponding byte array (see chapter 6.7)
             and then converting the byte array to a hexadecimal string.
-          example: |
-            010100000100000000000000200000002b76078fa709bbe6752222b215abc7ec0152ffe831fb4f9aed3e7749a425900a00093d0000000000000000002800000054444e46555946584f5353334e4e4c4f35465a5348535a49354c33374b4e5149454850554d584c54c0d45407000000000b00000001000000030000000c3215
+          example: 010100000100000000000000200000002b76078fa709bbe6752222b215abc7ec0152ffe831fb4f9aed3e7749a425900a00093d0000000000000000002800000054444e46555946584f5353334e4e4c4f35465a5348535a49354c33374b4e5149454850554d584c54c0d45407000000000b00000001000000030000000c3215
         signature:
           type: string
           description: The signature for the transaction as hexadecimal string.
-          example: |
-            db2473513c7f0ce9f8de6345f0fbe773dc687eb571123d08eab4d98f96849eaeb63fa8756fb6c59d9b9d0e551537c1cdad4a564747ff9291db4a88b65c97c10d"
+          example: db2473513c7f0ce9f8de6345f0fbe773dc687eb571123d08eab4d98f96849eaeb63fa8756fb6c59d9b9d0e551537c1cdad4a564747ff9291db4a88b65c97c10d
     # 9.36
     RequestPrepareAnnounce:
       type: object
